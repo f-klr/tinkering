@@ -28,9 +28,9 @@ class App:
         
     @classmethod
     def executeOverInstances(cls):
-        # stateless
         for obj in cls.__instances:
             yield (obj, obj.doSomething())
+        # stateless
 
     def doSomething(self, n = 10):
         d0 = 0
