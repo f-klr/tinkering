@@ -28,10 +28,9 @@ class App:
         
     @classmethod
     def executeOverInstances(cls):
-        r = []              # here we keep track of both "obj ref", and its doSomething return value
+        # stateless
         for obj in cls.__instances:
-            r.append((obj, obj.doSomething()))
-        return r
+            yield (obj, obj.doSomething())
 
     def doSomething(self, n = 10):
         d0 = 0
