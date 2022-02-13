@@ -36,9 +36,9 @@ class App:
     def doSomething(self, n = 10):
         d0 = 0
         d1 = 0
-        rj = lambda x: ''.join(reversed(x))
-        octs = lambda x: [rj(o).zfill(8) for o in reversed(textwrap.wrap(rj(bin(x)[2:]), 8))]
-        bits = lambda x: [int(n) for n in flatten(octs(x))]
+        rj = lambda s: ''.join(reversed(s))
+        octs = lambda n: [rj(o).zfill(8) for o in reversed(textwrap.wrap(rj(bin(n)[2:]), 8))]
+        bits = lambda n: [int(b) for b in flatten(octs(n))]
         for x in os.urandom(10):
             for b in bits(x):
                 match b:
