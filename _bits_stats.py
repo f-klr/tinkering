@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# this script is a demo showing how to compute bit/stats over a "/random"" source
+# this script is a demo showing how to compute bit/stats over a "/random" source
 # also, shows how to keep track of instantiated objects,
 # and "iterate" over them, then executing a "default" method,
 # that is "doSomething"
@@ -11,7 +11,7 @@ from functools import reduce
 from more_itertools import flatten
 import numpy as np
 import os
-import textwrap
+from textwrap import wrap as chunk
 
 class App:
     __instances = []
@@ -37,7 +37,7 @@ class App:
         d0 = 0
         d1 = 0
         rj = lambda s: ''.join(reversed(s))
-        octs = lambda n: [rj(o).zfill(8) for o in reversed(textwrap.wrap(rj(bin(n)[2:]), 8))]
+        octs = lambda n: [rj(o).zfill(8) for o in reversed(chunk(rj(bin(n)[2:]), 8))]
         bits = lambda n: [int(b) for b in flatten(octs(n))]
         for x in os.urandom(10):
             for b in bits(x):
