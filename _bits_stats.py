@@ -11,6 +11,7 @@ from functools import reduce
 from more_itertools import flatten
 import numpy as np
 import os
+import textwrap
 
 class App:
     __instances = []
@@ -35,7 +36,9 @@ class App:
     def doSomething(self, n = 10):
         d0 = 0
         d1 = 0
-        bits = lambda x: [int(n) for n in bin(x)[2:].zfill(8)]
+        rj = lambda x: ''.join(reversed(x))
+        octs = lambda x: [rj(o).zfill(8) for o in reversed(textwrap.wrap(rj(bin(x)[2:]), 8))]
+        bits = lambda x: [int(n) for n in flatten(octs(x))]
         for x in os.urandom(10):
             for b in bits(x):
                 match b:
