@@ -33,12 +33,12 @@ class App:
         # stateless
 
     @staticmethod
-    def bits(n, lpad = True):
+    def bits(n, zfill = -1):
         c = 0
         while True:
             yield n % 2
             c = c + 1
-            if (n == 0) and not(lpad) or not(c % 8):
+            if (n == 0) and ((zfill > 0) or not(c % zfill)):
                 break
             else:
                 n = n >> 1
@@ -47,7 +47,7 @@ class App:
         d0 = 0
         d1 = 0
         for x in os.urandom(n):
-            for b in App.bits(x):
+            for b in App.bits(x, 8):
                 if b == 0:
                     d0 = d0 + 1
                 elif b == 1:
