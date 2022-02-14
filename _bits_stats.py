@@ -11,7 +11,6 @@ from functools import reduce
 from more_itertools import flatten
 import numpy as np
 import os
-from textwrap import wrap as chunk
 
 class App:
     __instances = []
