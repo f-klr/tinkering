@@ -39,7 +39,7 @@ class App:
         while True:
             yield n % 2
             c = c + 1
-            if (n == 0) and not(lpad) or not(c % 8):
+            if (n == 0 and not(lpad)) or not(c % 8):
                 break
             else:
                 n = n >> 1
