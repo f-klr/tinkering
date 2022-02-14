@@ -12,6 +12,21 @@ from more_itertools import flatten
 import numpy as np
 import os
 
+class Number:
+    def __init__(self, n):
+        self.__n = n
+
+    def asBitStream(self, zfill = -1):
+        c = 0
+        n = self.__n
+        while True:
+            yield n % 2
+            c = c + 1
+            if (n == 0):
+                if (zfill <= 0) or not(c % zfill):
+                    break
+            n = n >> 1
+
 class App:
     __instances = []
 
@@ -32,21 +47,10 @@ class App:
             yield (obj, obj.doSomething())
         # stateless
 
-    @staticmethod
-    def bits(n, zfill = -1):
-        c = 0
-        while True:
-            yield n % 2
-            c = c + 1
-            if (n == 0):
-                if (zfill > 0) and not(c % zfill):
-                    break
-            n = n >> 1
-
     def doSomething(self, n = 10):
         d = { 0: 0, 1: 0 }
         for x in os.urandom(n):
-            for b in App.bits(x, 8):
+            for b in Number(x).asBitStream(zfill = 8):
                 d[b] = d[b] + 1
         return (d[0], d[1])
 
