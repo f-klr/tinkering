@@ -9,28 +9,39 @@
 
 from functools import reduce
 from more_itertools import flatten
-import numpy as np
+import textwrap
 import os
 
-class Number:
-    def __init__(self, n):
-        self.__n = n
+class Bytes:
+    def __init__(self, l):
+        self.__list = l
 
     def asBitStream(self, zfill = -1):
         c = 0
-        n = self.__n
-        while True:
-            yield n % 2
-            c = c + 1
-            if (n == 0):
-                if (zfill <= 0) or not(c % zfill):
-                    break
-            n = n >> 1
+        for n in self.__list:
+            while True:
+                yield n % 2
+                c = c + 1
+                if (n == 0):
+                    if (zfill <= 0) or not(c % zfill):
+                        break
+                n = n >> 1
+
+    def asOctects(self):
+        b = lambda n: bin(n)[2:]
+        r = lambda l: ''.join(reversed(l))
+        l = lambda n: textwrap.wrap(r(b(n)), 8)
+        for n in self.__list:
+            for chunk in reversed(l(n)):
+                if not(chunk):
+                    break        
+                yield r(chunk).zfill(8)
 
 class App:
     __instances = []
 
     def __init__(self):
+        self.__list = Bytes(os.urandom(10))
         App.setUp(self)
 
     @classmethod
@@ -40,28 +51,28 @@ class App:
     @classmethod
     def howMany(cls):
         return len(cls.__instances)
-        
+
     @classmethod
     def executeOverInstances(cls):
         for obj in cls.__instances:
             yield (obj, obj.doSomething())
         # stateless
 
-    def doSomething(self, n = 10):
-        d = { 0: 0, 1: 0 }
-        for x in os.urandom(n):
-            for b in Number(x).asBitStream(zfill = 8):
-                d[b] = d[b] + 1
-        return (d[0], d[1])
+    def doSomething(self):
+        s = { 0: 0, 1: 0 }
+        for b in self.__list.asBitStream(zfill = 8):
+            s[b] = s[b] + 1
+        return (s[0], s[1])
 
-    def doSomethingGreat(self, x = 100):
-        return reduce(lambda a, b: a+b, flatten([np.random.rand(1, 4) for i in range(x)]))
+    def doSomethingElse(self):
+        return list(self.__list.asOctects())
 
 if __name__ == '__main__':
+
     a1 = App()
     a2 = App()
     a3 = App()
-    a4 = App()
-    for obj, r in App.executeOverInstances():
-        print(obj.doSomethingGreat())
-        print(r)
+
+    for (o, x) in App.executeOverInstances():
+        print(x)
+        print(o.doSomethingElse())
