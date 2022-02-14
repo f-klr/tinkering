@@ -38,16 +38,15 @@ class App:
         while True:
             yield n % 2
             c = c + 1
-            if (n == 0) and ((zfill > 0) or not(c % zfill)):
+            if (n == 0) and not(zfill > 0) or not(c % zfill):
                 break
-            else:
-                n = n >> 1
+            n = n >> 1
 
     def doSomething(self, n = 10):
         d0 = 0
         d1 = 0
         for x in os.urandom(n):
-            for b in App.bits(x, 8):
+            for b in App.bits(x, zfill = 8):
                 if b == 0:
                     d0 = d0 + 1
                 elif b == 1:
