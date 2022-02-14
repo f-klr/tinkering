@@ -38,20 +38,17 @@ class App:
         while True:
             yield n % 2
             c = c + 1
-            if (n == 0) and not(zfill > 0) or not(c % zfill):
-                break
+            if (n == 0):
+                if (zfill > 0) and not(c % zfill):
+                    break
             n = n >> 1
 
     def doSomething(self, n = 10):
-        d0 = 0
-        d1 = 0
+        d = { 0: 0, 1: 0 }
         for x in os.urandom(n):
-            for b in App.bits(x, zfill = 8):
-                if b == 0:
-                    d0 = d0 + 1
-                elif b == 1:
-                    d1 = d1 + 1
-        return (d0, d1)
+            for b in App.bits(x, 8):
+                d[b] = d[b] + 1
+        return (d[0], d[1])
 
     def doSomethingGreat(self, x = 100):
         return reduce(lambda a, b: a+b, flatten([np.random.rand(1, 4) for i in range(x)]))
