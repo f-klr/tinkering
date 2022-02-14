@@ -54,8 +54,8 @@ class App:
 
     @classmethod
     def executeOverInstances(cls):
-        for obj in cls.__instances:
-            yield (obj, obj.doSomething())
+        for i in cls.__instances:
+            yield (i, i.doSomething())
         # stateless
 
     def doSomething(self):
