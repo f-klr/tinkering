@@ -33,17 +33,26 @@ class App:
             yield (obj, obj.doSomething())
         # stateless
 
+    @staticmethod
+    def bits(n, lpad = True):
+        c = 0
+        while True:
+            yield n % 2
+            c = c + 1
+            if (n == 0) and not(lpad) or not(c % 8):
+                break
+            else:
+                n = n >> 1
+
     def doSomething(self, n = 10):
         d0 = 0
         d1 = 0
-        rj = lambda s: ''.join(reversed(s))
-        octs = lambda n: [rj(o).zfill(8) for o in reversed(chunk(rj(bin(n)[2:]), 8))]
-        bits = lambda n: [int(b) for b in flatten(octs(n))]
-        for x in os.urandom(10):
-            for b in bits(x):
-                match b:
-                    case 0: d0 = d0 + 1
-                    case 1: d1 = d1 + 1
+        for x in os.urandom(n):
+            for b in App.bits(x):
+                if b == 0:
+                    d0 = d0 + 1
+                elif b == 1:
+                    d1 = d1 + 1
         return (d0, d1)
 
     def doSomethingGreat(self, x = 100):
