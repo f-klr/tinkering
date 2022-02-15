@@ -2,9 +2,7 @@
 
 #
 # this script is a demo showing how to compute bit/stats over a "/random" source
-# also, shows how to keep track of instantiated objects,
-# and "iterate" over them, then executing a "default" method,
-# that is "doSomething"
+# also, shows how to keep track of instances
 #
 
 from functools import reduce
