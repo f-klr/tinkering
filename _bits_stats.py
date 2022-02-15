@@ -26,9 +26,8 @@ class Bytes:
                 n = n >> 1
 
     def asOctects(self):
-        b = lambda n: bin(n)[2:]
         r = lambda l: ''.join(reversed(l))
-        l = lambda n: textwrap.wrap(r(b(n)), 8)
+        l = lambda n: textwrap.wrap(r(bin(n)[2:]), 8)
         for n in self.__list:
             for chunk in reversed(l(n)):
                 if not(chunk):
