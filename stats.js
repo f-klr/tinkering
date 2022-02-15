@@ -1,6 +1,4 @@
 /*
-* $Id$
-*
 * sample script to compute bit stats of an integer number.
 */
 
