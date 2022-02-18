@@ -8,7 +8,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/choleraehyq/gofunctools/functools"
 )
 
