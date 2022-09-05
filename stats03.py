@@ -37,10 +37,10 @@ class App:
     def _bits(n):
         return lambda x: [int(n) for n in bin(x)[2:].zfill(8)]
 
-    def doSomething(self, n = 11):
+    def doSomething(self, n = 10):
         bits = self._bits(n)
         d0, d1 = 0, 0 
-        for x in os.urandom(14):
+        for x in os.urandom(30):
             for b in bits(x):
                 match b:
                     case 0: d0 = d0 + 1
