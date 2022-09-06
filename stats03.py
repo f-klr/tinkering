@@ -34,7 +34,8 @@ class App:
         return r
 
     class Stats:
-        def __init__(self, digits = "01"):
+        __DEFATULT_DIGITS = "01"
+        def __init__(self, digits = __DEFATULT_DIGITS):
             self.__digits = digits
             self.__stats = dict(zip(map(int, digits), [0] * len(digits)))
 
