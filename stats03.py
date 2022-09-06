@@ -34,13 +34,13 @@ class App:
         return r
 
     @staticmethod
-    def _bits(n):
-        return lambda x: [int(n) for n in bin(x)[2:].zfill(8)]
+    def _bits():
+        return lambda x: [int(b) for b in bin(x)[2:].zfill(8)]
 
     def doSomething(self, n = 10):
-        bits = self._bits(n)
+        bits = self._bits()
         d0, d1 = 0, 0 
-        for x in os.urandom(30):
+        for x in os.urandom(n):
             for b in bits(x):
                 match b:
                     case 0: d0 = d0 + 1
@@ -57,4 +57,3 @@ if __name__ == '__main__':
     for obj, r in App.executeOverInstances():
         print(obj.doSomethingGreat())
         print(r)
-
