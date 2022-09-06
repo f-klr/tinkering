@@ -66,11 +66,13 @@ class App:
     def doSomething(self, n = 10):
         _bits = self._n_to_alpha_digits(2)      # we a get a "lambda" ref. as to convert a numberto "bin" digits
         s = self.Stats("01")                    # here we keep some bin stats
-        def collect_stats(x):
+
+        def _collect_stats(x):
             for b in _bits(x):
                 s.updateWithOneDigit(b)
-        for x in os.urandom(n): collect_stats(x)
-        
+
+        for x in os.urandom(n): _collect_stats(x)
+
         return (s[0], s[1])
 
     def doSomethingGreat(self, x = 100):
