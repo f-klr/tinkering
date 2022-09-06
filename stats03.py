@@ -65,7 +65,7 @@ class App:
 
     def doSomething(self, n = 10):
         _bits = self._n_to_alpha_digits(2)      # we a get a "lambda" ref. as to convert a numberto "bin" digits
-        s = self.Stats("01")                    # here we keep some bin stats
+        s = self.Stats()                    # here we keep some stats (default, is "binary")
 
         def _collect_stats(x):
             for b in _bits(x):
