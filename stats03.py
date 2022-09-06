@@ -7,6 +7,7 @@
 # that is "doSomething"
 #
 
+from functools import partial
 from functools import reduce
 from more_itertools import flatten
 import numpy as np
@@ -33,46 +34,27 @@ class App:
             r.append((obj, obj.doSomething()))
         return r
 
-    class Stats:
-        __DEFATULT_DIGITS = "01"
-        def __init__(self, digits = __DEFATULT_DIGITS):
-            self.__digits = digits
-            self.__stats = dict(zip(map(int, digits), [0] * len(digits)))
-
-        def _check_digits(self, d):
-            if not(d in map(int, self.__digits)):
-                raise ValueError("Digits must be: '%s'" % (self.__digits))
-
-        def updateWithOneDigit(self, d):
-            self._check_digits(d)
-            self.__stats[d] = self.__stats[d] + 1
-
-        def __getitem__(self, d):               # this is a "subscript" replcement
-            self._check_digits(d)
-            return self.__stats[d]
+    __default_digits = "01"
+    __default_r = 2
 
     @staticmethod
-    def _n_to_alpha_digits(r = 2):
-        _strip_leading_prefix = lambda s, n=2: s[n:]  
+    def _n_to_alpha_digits(r = __default_r):
+        _strip_leading_prefix = lambda s, n=2: s[n:]
+        _n_to_alpha_digits_INTERNAL = lambda c, s, p, x: _strip_leading_prefix(c(x), s).zfill(p)
         match r:
-            case 2:
-                return lambda x: [int(b) for b in _strip_leading_prefix(bin(x)).zfill(8)]
-            case 8:
-                return lambda x: [int(d) for d in oct(x).zfill(4)]
-            case 16:
-                return lambda x: [int(h) for h in _strip_leading_prefix(hex(x)).zfill(2)]
-        raise ValueError("RADIX must be, either 2, 8 or 16 - check it out!")
+            case  2:  _f = partial(_n_to_alpha_digits_INTERNAL, bin, 8, 2)
+            case  8:  _f = partial(_n_to_alpha_digits_INTERNAL, oct, 4, 0)
+            case 16:  _f = partial(_n_to_alpha_digits_INTERNAL, hex, 2, 2)
+        if '_f' in locals():
+            return lambda x: [int(d) for d in _f(x)]
+        raise ValueError("RADIX must be, either 2, 8 or 16.")
 
-    def doSomething(self, n = 10):
-        _bits = self._n_to_alpha_digits(2)      # we a get a "lambda" ref. as to convert a numberto "bin" digits
-        s = self.Stats()                    # here we keep some stats (default, is "binary")
-
-        def _collect_stats(x):
+    def doSomething(self, n = 20):
+        _bits = self._n_to_alpha_digits()      # we a get a "lambda" ref. as to convert a numberto "bin" digits
+        s = dict(zip(map(int, self.__default_digits), [0] * len(self.__default_digits)))
+        for x in os.urandom(n):
             for b in _bits(x):
-                s.updateWithOneDigit(b)
-
-        for x in os.urandom(n): _collect_stats(x)
-
+                s[b] = s[b] + 1
         return (s[0], s[1])
 
     def doSomethingGreat(self, x = 100):
