@@ -13,7 +13,7 @@ import numpy as np
 import os
 
 class App:
-    __instances = []
+    __instances = []        # keep tracks of "class" instances
 
     def __init__(self):
         App.setUp(self)
@@ -28,24 +28,49 @@ class App:
         
     @classmethod
     def executeOverInstances(cls):
-        r = []              # here we keep track of both "obj ref", and its doSomething return value
+        r = []              # we keep track of both "obj ref", and its "doSomething()" return value
         for obj in cls.__instances:
             r.append((obj, obj.doSomething()))
         return r
 
+    class Stats:
+        def __init__(self, digits = "01"):
+            self.__digits = digits
+            self.__stats = dict(zip(map(int, digits), [0] * len(digits)))
+
+        def _check_digits(self, d):
+            if not(d in map(int, self.__digits)):
+                raise ValueError("Digits must be: '%s'" % (self.__digits))
+
+        def updateWithOneDigit(self, d):
+            self._check_digits(d)
+            self.__stats[d] = self.__stats[d] + 1
+
+        def __getitem__(self, d):               # this is a "subscript" replcement
+            self._check_digits(d)
+            return self.__stats[d]
+
     @staticmethod
-    def _bits():
-        return lambda x: [int(b) for b in bin(x)[2:].zfill(8)]
+    def _n_to_alpha_digits(r = 2):
+        _strip_leading_prefix = lambda s, n=2: s[n:]  
+        match r:
+            case 2:
+                return lambda x: [int(b) for b in _strip_leading_prefix(bin(x)).zfill(8)]
+            case 8:
+                return lambda x: [int(d) for d in oct(x).zfill(4)]
+            case 16:
+                return lambda x: [int(h) for h in _strip_leading_prefix(hex(x)).zfill(2)]
+        raise ValueError("RADIX must be, either 2, 8 or 16 - check it out!")
 
     def doSomething(self, n = 10):
-        bits = self._bits()
-        d0, d1 = 0, 0 
-        for x in os.urandom(n):
-            for b in bits(x):
-                match b:
-                    case 0: d0 = d0 + 1
-                    case 1: d1 = d1 + 1
-        return (d0, d1)
+        _bits = self._n_to_alpha_digits(2)      # we a get a "lambda" ref. as to convert a numberto "bin" digits
+        s = self.Stats("01")                    # here we keep some bin stats
+        def collect_stats(x):
+            for b in _bits(x):
+                s.updateWithOneDigit(b)
+        for x in os.urandom(n): collect_stats(x)
+        
+        return (s[0], s[1])
 
     def doSomethingGreat(self, x = 100):
         return reduce(lambda a, b: a+b, flatten([np.random.rand(1, 4) for i in range(x)]))
