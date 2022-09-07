@@ -42,9 +42,12 @@ class App:
         _strip_leading_prefix = lambda s, n=2: s[n:]
         _n2a = lambda c, s, p, x: _strip_leading_prefix(c(x), s).zfill(p)
         match r:
-            case  2:  _f = partial(_n2a, bin, 8, 2)
-            case  8:  _f = partial(_n2a, oct, 4, 0)
-            case 16:  _f = partial(_n2a, hex, 2, 2)
+            case  2:
+                _f = partial(_n2a, bin, 8, 2)
+            case  8:
+                _f = partial(_n2a, oct, 4, 0)
+            case 16:
+                _f = partial(_n2a, hex, 2, 2)
         if '_f' in locals():
             return lambda x: [int(d) for d in _f(x)]
         raise ValueError("RADIX must be, either 2, 8 or 16.")
