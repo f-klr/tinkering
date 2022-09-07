@@ -48,12 +48,12 @@ class App:
                 _f = partial(_n2a, oct, 4, 0)
             case 16:
                 _f = partial(_n2a, hex, 2, 2)
-        if '_f' in locals():
-            return lambda x: [int(d) for d in _f(x)]
-        raise ValueError("RADIX must be, either 2, 8 or 16.")
+            case _:
+                raise ValueError("RADIX must be, either 2, 8 or 16.")
+        return lambda x: [int(d) for d in _f(x)]
 
     def doSomething(self, n = 20):
-        _bits = self._n_to_alpha_digits()      # we a get a "lambda" ref. as to convert a numberto "bin" digits
+        _bits = self._n_to_alpha_digits()      # we a get a "lambda" ref. as to convert a number to "bin" digits
         s = dict(zip(map(int, self.__default_digits), [0] * len(self.__default_digits)))
         for x in os.urandom(n):
             for b in _bits(x):
