@@ -58,7 +58,7 @@ class App:
         for x in os.urandom(n):
             for b in _bits(x):
                 s[b] = s[b] + 1
-        return (s[0], s[1])
+        return tuple(map(int, [s[k] for k in sorted(s.keys())]))    # make a list of values(), by asc(ending) key sort order 
 
     def doSomethingGreat(self, x = 100):
         return reduce(lambda a, b: a+b, flatten([np.random.rand(1, 4) for i in range(x)]))
