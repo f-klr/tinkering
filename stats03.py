@@ -13,6 +13,35 @@ from more_itertools import flatten
 import numpy as np
 import os
 
+class Digits:
+    __digits = "0123456789abcdefghijklmnopqrstuwxyz"
+    __default_r = 2
+
+    @staticmethod
+    def __n_to_alpha_digits(r):
+        _strip_leading_prefix = lambda s, n=2: s[n:]
+        _n2a = lambda c, s, p, x: _strip_leading_prefix(c(x), s).zfill(p)
+        match r:
+            case 0x02: _f = partial(_n2a, bin, 8, 2)
+            case 0x08: _f = partial(_n2a, oct, 4, 0)
+            case 0x10: _f = partial(_n2a, hex, 2, 2)
+            case _: raise ValueError("radix must be, either 2, 8 or 16.")
+        return lambda x: [int(d) for d in _f(x)]
+
+    __init_stats = lambda self, n: \
+        dict(zip(map(int, self.__digits[:n]), [0] * n))
+
+    def __init__(self, r):
+        self.__f = self.__n_to_alpha_digits(r)     # we a get a "lambda" ref. as to convert a number to, eg. "bin" digits
+        self.__s = self.__init_stats(r)
+
+    def update(self, n):
+        for i in self.__f(n):
+            self.__s[i] = self.__s[i] + 1
+
+    def get(self):
+        return tuple([self.__s[k] for k in sorted(self.__s.keys())])
+
 class App:
     __instances = []        # keep tracks of "class" instances
 
@@ -21,7 +50,7 @@ class App:
 
     @classmethod
     def setUp(cls, obj):
-        cls.__instances.append(obj)
+        return cls.__instances.append(obj)
 
     @classmethod
     def howMany(cls):
@@ -29,39 +58,21 @@ class App:
         
     @classmethod
     def executeOverInstances(cls):
-        r = []              # we keep track of both "obj ref", and its "doSomething()" return value
+        refs = []               # we keep track of both "obj ref", and its "doSomething()" return value
         for obj in cls.__instances:
-            r.append((obj, obj.doSomething()))
-        return r
-
-    __default_digits = "01"
-    __default_r = 2
-
-    @staticmethod
-    def _n_to_alpha_digits(r = __default_r):
-        _strip_leading_prefix = lambda s, n=2: s[n:]
-        _n2a = lambda c, s, p, x: _strip_leading_prefix(c(x), s).zfill(p)
-        match r:
-            case  2:
-                _f = partial(_n2a, bin, 8, 2)
-            case  8:
-                _f = partial(_n2a, oct, 4, 0)
-            case 16:
-                _f = partial(_n2a, hex, 2, 2)
-            case _:
-                raise ValueError("RADIX must be, either 2, 8 or 16.")
-        return lambda x: [int(d) for d in _f(x)]
-
-    def doSomething(self, n = 20):
-        _bits = self._n_to_alpha_digits()      # we a get a "lambda" ref. as to convert a number to "bin" digits
-        s = dict(zip(map(int, self.__default_digits), [0] * len(self.__default_digits)))
+            refs.append((obj, obj.doSomething()))
+        return refs
+    
+    def doSomething(self, n = 100):
+        d = Digits(8)
         for x in os.urandom(n):
-            for b in _bits(x):
-                s[b] = s[b] + 1
-        return tuple(map(int, [s[k] for k in sorted(s.keys())]))    # make a list of values(), by asc(ending) key sort order 
+            d.update(x)
+        return d.get()
 
     def doSomethingGreat(self, x = 100):
-        return reduce(lambda a, b: a+b, flatten([np.random.rand(1, 4) for i in range(x)]))
+        s2 = lambda a, b: a+b
+        nl = [np.random.rand(1, 4) for i in range(x)]
+        return reduce(s2, flatten(nl))
 
 if __name__ == '__main__':
     a1 = App()
