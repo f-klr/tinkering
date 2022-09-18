@@ -22,9 +22,12 @@ class Digits:
         _strip_leading_prefix = lambda s, n=2: s[n:]
         _n2a = lambda c, s, p, x: _strip_leading_prefix(c(x), s).zfill(p)
         match r:
-            case 0x02: _f = partial(_n2a, bin, 8, 2)
-            case 0x08: _f = partial(_n2a, oct, 4, 0)
-            case 0x10: _f = partial(_n2a, hex, 2, 2)
+            case 0x02:
+                _f = partial(_n2a, bin, 8, 2)
+            case 0x08:
+                _f = partial(_n2a, oct, 4, 0)
+            case 0x10:
+                _f = partial(_n2a, hex, 2, 2)
             case _: raise ValueError("radix must be, either 2, 8 or 16.")
         return lambda x: [int(d) for d in _f(x)]
 
