@@ -19,31 +19,32 @@ class Digits:
 
     @staticmethod
     def __n_to_alpha_digits(r):
-        _strip_leading_prefix = lambda s, n=2: s[n:]
-        _n2a = lambda c, s, p, x: _strip_leading_prefix(c(x), s).zfill(p)
+        strip_leading_prefix = lambda s, n=2: s[n:]
+        n2a = lambda c, s, p, x: strip_leading_prefix(c(x), s).zfill(p)
         match r:
             case 0x02:
-                _f = partial(_n2a, bin, 8, 2)
+                fn = partial(n2a, bin, 8, 2)
             case 0x08:
-                _f = partial(_n2a, oct, 4, 0)
+                fn = partial(n2a, oct, 4, 0)
             case 0x10:
-                _f = partial(_n2a, hex, 2, 2)
+                fn = partial(n2a, hex, 2, 2)
             case _: raise ValueError("radix must be, either 2, 8 or 16.")
-        return lambda x: [int(d) for d in _f(x)]
+        return lambda x: [int(d) for d in fn(x)]
 
     __init_stats = lambda self, n: \
         dict(zip(map(int, self.__digits[:n]), [0] * n))
 
-    def __init__(self, r):
-        self.__f = self.__n_to_alpha_digits(r)     # we a get a "lambda" ref. as to convert a number to, eg. "bin" digits
-        self.__s = self.__init_stats(r)
+    def __init__(self, radix):
+        self.__f = self.__n_to_alpha_digits(radix)  # we a get a "lambda" ref. as to convert a number to, eg. "bin" digits
+        self.__s = self.__init_stats(radix)
 
     def update(self, n):
         for i in self.__f(n):
             self.__s[i] = self.__s[i] + 1
 
     def get(self):
-        return tuple([self.__s[k] for k in sorted(self.__s.keys())])
+        for k in sorted(self.__s.keys()):
+            yield self.__s[k]
 
 class App:
     __instances = []        # keep tracks of "class" instances
@@ -67,20 +68,21 @@ class App:
         return refs
     
     def doSomething(self, n = 100):
-        d = Digits(8)
+        d = Digits(2)
         for x in os.urandom(n):
             d.update(x)
-        return d.get()
+        return tuple(d.get())
 
-    def doSomethingGreat(self, x = 100):
-        s2 = lambda a, b: a+b
-        nl = [np.random.rand(1, 4) for i in range(x)]
-        return reduce(s2, flatten(nl))
+    def doSomethingGreat(self, n = 100):
+        a_few_numbers = [ \
+            np.random.rand(1, 10) \
+                for i in range(n) \
+        ]
+        return reduce(lambda a, b: a+b, flatten(a_few_numbers))
 
 if __name__ == '__main__':
     a1 = App()
     someInstances = [App() for i in range(0, 4)]
-    
     for obj, r in App.executeOverInstances():
         print(obj.doSomethingGreat())
         print(r)
