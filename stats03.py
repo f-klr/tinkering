@@ -9,33 +9,31 @@
 
 from functools import partial
 from functools import reduce
-from more_itertools import flatten
-import numpy as np
+
 import os
+import numpy as np
+from more_itertools import flatten
 
 class Digits:
     __digits = "0123456789abcdefghijklmnopqrstuwxyz"
     __default_r = 2
 
     @staticmethod
-    def __n_to_alpha_digits(r):
+    def __n_to_alpha_digits(radix):
         strip_leading_prefix = lambda s, n=2: s[n:]
         n2a = lambda c, s, p, x: strip_leading_prefix(c(x), s).zfill(p)
-        match r:
-            case 0x02:
-                fn = partial(n2a, bin, 8, 2)
-            case 0x08:
-                fn = partial(n2a, oct, 4, 0)
-            case 0x10:
-                fn = partial(n2a, hex, 2, 2)
+        match radix:
+            case 2: fn = partial(n2a, bin, 8, 2)
+            case 8: fn = partial(n2a, oct, 4, 0)
+            case 0x10: fn = partial(n2a, hex, 2, 2)
             case _: raise ValueError("radix must be, either 2, 8 or 16.")
         return lambda x: [int(d) for d in fn(x)]
 
     __init_stats = lambda self, n: \
         dict(zip(map(int, self.__digits[:n]), [0] * n))
 
-    def __init__(self, radix):
-        self.__f = self.__n_to_alpha_digits(radix)  # we a get a "lambda" ref. as to convert a number to, eg. "bin" digits
+    def __init__(self, radix = __default_r):
+        self.__f = self.__n_to_alpha_digits(radix)  # we get a "lambda" ref. as to convert a number to, eg. "bin" digits
         self.__s = self.__init_stats(radix)
 
     def update(self, n):
@@ -57,23 +55,21 @@ class App:
         return cls.__instances.append(obj)
 
     @classmethod
-    def howMany(cls):
+    def how_many(cls):
         return len(cls.__instances)
-        
+  
     @classmethod
-    def executeOverInstances(cls):
-        refs = []               # we keep track of both "obj ref", and its "doSomething()" return value
+    def execute_over_instances(cls):
         for obj in cls.__instances:
-            refs.append((obj, obj.doSomething()))
-        return refs
-    
-    def doSomething(self, n = 100):
-        d = Digits(2)
+            yield obj, obj.do_something()
+
+    def do_something(self, n = 100):
+        d = Digits()
         for x in os.urandom(n):
             d.update(x)
         return tuple(d.get())
 
-    def doSomethingGreat(self, n = 100):
+    def do_something_great(self, n = 100):
         a_few_numbers = [ \
             np.random.rand(1, 10) \
                 for i in range(n) \
@@ -83,6 +79,6 @@ class App:
 if __name__ == '__main__':
     a1 = App()
     someInstances = [App() for i in range(0, 4)]
-    for obj, r in App.executeOverInstances():
-        print(obj.doSomethingGreat())
+    for obj, r in App.execute_over_instances():
+        print(obj.do_something_great())
         print(r)
