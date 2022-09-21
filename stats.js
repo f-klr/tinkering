@@ -1,36 +1,65 @@
 /*
-* sample script to compute bit stats of an integer number.
+* Sample script to compute bit stats of an integer number.
 */
 
-const DEFAULT_HEX_DIGITS = '0123456789abcedf';
-const DEFAULT_BIN_DIGITS = '01';
-
-let t = new Map(
-	DEFAULT_BIN_DIGITS.split('').map((i) => {
-		return [ parseInt(i), i ]
-	})
-);
-
-let bits = function(n) {
-	let b = '';
-	for (i = n; ; i = i >> 1) {
-		b = t.get(i % 2) + b;
-		if (i <= 0) {
-			break;
-		}
-	}
-	return b;
+Object.prototype.print = function(output) {
+	Object.entries(this).forEach(
+		([k, value]) => { output.log(k, " - ", value); }
+	);
 }
 
-let computeBinStats = function(n, digits = DEFAULT_BIN_DIGITS) {
-	let stats = {};
-	for (let c of bits(n)) {
-		if (DEFAULT_BIN_DIGITS.includes(c)) {
-				stats[c] = c in stats ? stats[c]+1 : 1;
+class Digits {
+	static __SEQ = '0123456789abcedfghijklmopqrstuvwyz';
+
+	constructor(radix) {
+		this.__radix = radix;
+		this.__digits = Digits.__SEQ.substring(0, radix);
+		this.setUp();
+	}
+
+	setUp() {
+		this.__t = new Map(
+			this.__digits.split('')
+				.map(
+					(i) => { return [ parseInt(i, this.__radix), i ] }
+				)
+		);
+		this.__stats = {};
+		for (const d of this.__digits) {
+			this.__stats[d] = 0;
 		}
 	}
-	return stats;
+
+	update(n) {
+		this.__stats[n]++;
+	}
+
+	getStats() {
+		return this.__stats;
+	}
 }
 
-let s = computeBinStats(0xbeef);
-console.log(s);
+class Binary extends Digits {
+	constructor() {
+		super(2);
+	}
+
+	__bits(n) {
+		let b = '';
+		for (let i = n; ; i = i >> 1) {
+			b = this.__t.get(i % 2) + b;
+			if (i <= 0) break;
+		}
+		return b;
+	}
+
+	computeStats(n) {
+		for (const b of this.__bits(n)) {
+			this.update(b);
+		}
+		return this.getStats();
+	}
+}
+
+let obj = new Binary();
+obj.computeStats(0xfede).print(console);
