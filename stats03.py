@@ -19,8 +19,8 @@ class Digits:
     __default_r = 2
 
     @staticmethod
-    def __n_to_alpha_digits(radix):
-        l = lambda asStr, p, i, x: (asStr(x)[i:]).zfill(p)
+    def asList(radix):
+        l = lambda n2s, p, i, x: (n2s(x)[i:]).zfill(p)
         match radix:
             case 2: fn = partial(l, bin, 8, 2)
             case 8: fn = partial(l, oct, 4, 2)
@@ -32,7 +32,7 @@ class Digits:
         dict(zip(map(int, self.__digits[:n]), [0] * n))
 
     def __init__(self, radix = __default_r):
-        self.__f = self.__n_to_alpha_digits(radix)  # we get a "lambda" ref. as to convert a number to, eg. "bin" digits
+        self.__f = self.asList(radix)    # we get a "lambda" ref. as to convert a number to, eg. "bin" digits
         self.__s = self.__init_stats(radix)
 
     def update(self, n):
@@ -47,10 +47,10 @@ class App:
     __instances = []        # keep tracks of "class" instances
 
     def __init__(self):
-        App.setUp(self)
+        App.setup(self)
 
     @classmethod
-    def setUp(cls, obj):
+    def setup(cls, obj):
         return cls.__instances.append(obj)
 
     @classmethod
