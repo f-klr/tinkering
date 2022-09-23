@@ -19,14 +19,14 @@ class Digits:
     __default_r = 2
 
     @staticmethod
-    def __n_to_alpha_digits(r):
+    def __n_to_alpha_digits(radix):
         __n2a = lambda f, p, i, x: (f(x)[i:]).zfill(p)
-        match r:
+        match radix:
             case 2: fn = partial(__n2a, bin, 8, 2)
             case 8: fn = partial(__n2a, oct, 4, 2)
             case 0x10: fn = partial(__n2a, hex, 2, 2)
             case _: raise ValueError("radix must be, either 2, 8 or 16.")
-        return lambda x: [int(d) for d in fn(x)]
+        return lambda x: [int(d, radix) for d in fn(x)]
 
     __init_stats = lambda self, n: \
         dict(zip(map(int, self.__digits[:n]), [0] * n))
