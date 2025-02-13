@@ -41,9 +41,8 @@ class Converter:
 
     def as_list(self: object, n: int) -> List[Any]:
         if n < 0: raise ValueError("We only convert positive numbers sorry :/")
-        p = Converter.lookup(self.base)
-        i = lambda d: int(d, self.base) if d in string.digits else d
-        return [ i(d) for d in p(n) ]
+        return [ int(d, self.base) if d in string.digits else d \
+            for d in Converter.lookup(self.base)(n) ]
 
     def __init__(self: object, base: int) -> object:
         if not base in range(2, 36):
